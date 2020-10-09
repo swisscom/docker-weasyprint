@@ -14,11 +14,17 @@ app = Flask('pdf')
 def authenticate(f):
     @wraps(f)
     def checkauth(*args, **kwargs):
-        if 'X_API_KEY' not in request.headers or os.environ.get('X_API_KEY') == request.headers['X_API_KEY']:
-            return f(*args, **kwargs)
-        else:
-            abort(401)
-
+        if os.environ.get('X_API_KEY') is not None:
+            if os.environ.get('X_API_KEY') == request.headers['X_API_KEY']:
+                return f(*args, **kwargs)
+            else:
+                abort(401)
+        if os.environ.get('Authorization') is not None:
+            if os.environ.get('Authorization') == request.headers['Authorization']:
+                return f(*args, **kwargs)
+            else:
+                abort(401)
+        return f(*args, **kwargs)
     return checkauth
 
 
